@@ -1,6 +1,6 @@
 # Codelf
 
-> By DJJ & TigerLee
+> By DJJ & Dannielee
 
 Codelf is a powerful AI-assisted coding tool that provides better code understanding and modification capabilities for AI agents through the Model Context Protocol (MCP).
 
