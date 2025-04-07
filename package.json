@@ -2,8 +2,12 @@
   "name": "codelf",
   "version": "1.0.0",
   "main": "index.js",
-  "keywords": [],
-  "author": "",
+  "keywords": ["MCP", "codelf", "AI IDE", "cursor", "claude", "ai assistant", "ai agent", "ai editor"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Disdjj/codelf"
+  },
+  "author": "DJJ & Dannielee",
   "description": "",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.5.0",
