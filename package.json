@@ -3,11 +3,17 @@
   "version": "1.0.1",
   "main": "index.js",
   "keywords": ["MCP", "codelf", "AI IDE", "cursor", "claude", "ai assistant", "ai agent", "ai editor"],
-  "bin": "./build/index.js",
+  "bin": {
+    "codelf": "build/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Disdjj/codelf"
   },
+  "files": [
+    "build"
+  ],
+  "license": "MIT",
   "author": "DJJ & Dannielee",
   "description": "",
   "dependencies": {
