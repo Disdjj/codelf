@@ -1,10 +1,23 @@
-# Codelf
+# Codelf＃codelf＃codelf＃codelf
 
 > By DJJ & Dannielee
 
 Codelf is a powerful AI-assisted coding tool that provides better code understanding and modification capabilities for AI agents through the Model Context Protocol (MCP).
 
 ## MCP Setup
+
+add mcp settings
+```
+{
+  "mcpServers": {
+    "codelf": {
+      "command": "npx",
+      "args": ["codelf"]
+    }
+  }
+}
+
+```
 
 1. Initialize codelf in Cursor/Windsurf agent mode by sending the command:
 ```
