@@ -19,6 +19,13 @@ do init-codelf and follow the instructions
 do update-project-info
 ```
 
+## Cursor Setup
+
+1. goto `Settings` -> `Rules` -> `User Rules`
+2. add Content "Before responding or modifying the code, one should first obtain comprehensive information via `get-project-info` before making any decisions."
+3. if you are in windows, add "I am currently under the Windows system. Use like "C:\Users\..." to send Path"
+
+
 ## Core Features
 
 ### AI IDE Friendly
