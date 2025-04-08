@@ -1,14 +1,13 @@
 {
   "name": "codelf",
-  "version": "1.0.1",
-  "main": "index.js",
+  "version": "1.0.7",
   "keywords": ["MCP", "codelf", "AI IDE", "cursor", "claude", "ai assistant", "ai agent", "ai editor"],
-  "bin": {
-    "codelf": "build/index.js"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Disdjj/codelf"
+  },
+  "bin": {
+    "codelf": "build/index.js"
   },
   "files": [
     "build"
