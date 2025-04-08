@@ -24,9 +24,9 @@ add mcp settings
 do init-codelf and follow the instructions
 ```
 
-2. In most cases, prompts will be automatically assembled by codelf
+1. In most cases, prompts will be automatically assembled by codelf
 
-3. After the agent completes writing, you can prompt:
+2. After the agent completes writing, you can prompt:
 
 ```
 do update-project-info
@@ -35,8 +35,16 @@ do update-project-info
 ## Cursor Setup
 
 1. goto `Settings` -> `Rules` -> `User Rules`
-2. add Content "Before responding or modifying the code, one should first obtain comprehensive information via `get-project-info` before making any decisions."
-3. if you are in windows, add "I am currently under the Windows system. Use like "C:\Users\..." to send Path"
+2. add Content 
+```
+Before responding or modifying the code, one should first obtain comprehensive information via `get-project-info` before making any decisions.
+```
+3. add Content
+```
+Everytime you finish editing code, call `update-project-info` and follow the instructions from the response
+```
+4. if you are in windows, add 
+    ```I am currently under the Windows system. Use like "C:\Users\..." to send Path```
 
 
 ## Core Features
