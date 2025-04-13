@@ -40,12 +40,9 @@ do update-project-info
 2. add Content 
 ```
 Before responding or modifying the code, one should first obtain comprehensive information via `get-project-info` before making any decisions.
+Everytime you finish editing code, you must call `update-project-info` and follow the instructions from the response
 ```
-3. add Content
-```
-Everytime you finish editing code, call `update-project-info` and follow the instructions from the response
-```
-4. if you are in windows, add 
+3. if you are in windows, add 
     ```I am currently under the Windows system. Use like "C:\Users\..." to send Path```
 
 ## Windsurf Setup
@@ -54,7 +51,7 @@ Everytime you finish editing code, call `update-project-info` and follow the ins
 2. add Content
 ```
 Before responding or modifying the code, one should first obtain comprehensive information via `get-project-info` before making any decisions.
-Everytime you finish editing code, call `update-project-info` and follow the instructions from the response
+Everytime you finish editing code, you must call `update-project-info` and follow the instructions from the response
 ```
 3. if you are in windows, add 
 ```
