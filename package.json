@@ -1,7 +1,16 @@
 {
   "name": "codelf",
   "version": "1.0.7",
-  "keywords": ["MCP", "codelf", "AI IDE", "cursor", "claude", "ai assistant", "ai agent", "ai editor"],
+  "keywords": [
+    "MCP",
+    "codelf",
+    "AI IDE",
+    "cursor",
+    "claude",
+    "ai assistant",
+    "ai agent",
+    "ai editor"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Disdjj/codelf"
@@ -19,6 +28,8 @@
     "@modelcontextprotocol/sdk": "^1.5.0",
     "@react-email/components": "^0.0.33",
     "@react-email/render": "^1.0.5",
+    "@types/gitignore-parser": "^0.0.3",
+    "gitignore-parser": "^0.0.2",
     "minimist": "^1.2.8",
     "resend": "^4.1.2",
     "zod": "^3.24.2"

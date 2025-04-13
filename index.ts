@@ -2,37 +2,67 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
-import { promises as fs } from "fs";
-import * as path from "path";
 import { exec } from "child_process";
+import { existsSync, promises as fs } from "fs";
+import * as path from "path";
 import { promisify } from "util";
+import { z } from "zod";
+import * as gitignoreParser from "gitignore-parser";
 
 const execPromise = promisify(exec);
+// 默认黑名单，当.gitignore不存在时使用
 const folderBlackList = [
-  "node_modules", 
-  ".codelf", 
-  ".git", 
-  ".idea", 
-  ".vscode", 
-  "dist", 
-  "build", 
-  "out", 
-  "target", 
-  "bin", 
-  "obj", 
-  ".next", 
-  "coverage", 
-  "__pycache__", 
-  ".DS_Store", 
-  "tmp", 
-  "temp", 
-  "logs", 
-  ".cache", 
-  ".github", 
-  ".gitlab", 
-  "vendor"
+  "node_modules",
+  ".codelf",
+  ".git",
+  ".idea",
+  ".vscode",
+  "dist",
+  "build",
+  "out",
+  "target",
+  "bin",
+  "obj",
+  ".next",
+  "coverage",
+  "__pycache__",
+  ".DS_Store",
+  "tmp",
+  "temp",
+  "logs",
+  ".cache",
+  ".github",
+  ".gitlab",
+  "vendor",
 ];
+
+const forceBlackList = [".git", ".codelf", ".vscode", ".idea"];
+
+// 用于解析.gitignore文件的函数
+async function parseGitignore(
+  rootPath: string,
+  targetPath: string
+): Promise<boolean | null> {
+  const gitignorePath = path.join(rootPath, ".gitignore");
+
+  // 检查.gitignore文件是否存在
+  if (!existsSync(gitignorePath)) {
+    return null;
+  }
+
+  try {
+    // 读取.gitignore文件内容
+    const content = await fs.readFile(gitignorePath, "utf-8");
+    // 使用gitignore-parser的compile方法解析.gitignore内容
+    const gitignore = gitignoreParser.compile(content);
+
+    // 使用denies方法检查路径是否被拒绝（被忽略）
+    return gitignore.denies(targetPath);
+  } catch (error) {
+    console.error("Error parsing .gitignore:", error);
+    return null;
+  }
+}
 
 // Create server instance
 const server = new McpServer({
@@ -212,19 +242,42 @@ async function getFileTree(rootPath: string): Promise<string> {
   const tree: string[] = [];
   const indent = "    ";
 
-  const buildTree = async (dir: string, prefix: string): Promise<string[]> => {
+  // 尝试解析.gitignore文件
+  // 如果.gitignore存在且解析成功，使用其规则；否则使用默认黑名单
+
+  const buildTree = async (
+    dir: string,
+    prefix: string,
+    relativePath: string = ""
+  ): Promise<string[]> => {
     const entries = await fs.readdir(dir, { withFileTypes: true });
     const result: string[] = [];
 
     for (const entry of entries) {
-      if (entry.isDirectory() && !folderBlackList.includes(entry.name)) {
+      if (entry.isDirectory() && forceBlackList.includes(entry.name)) {
+        continue;
+      }
+
+      const entryRelativePath = path
+        .join(relativePath, entry.name)
+        .replace(/\\/g, "/");
+      const isIgnore = await parseGitignore(rootPath, entryRelativePath);
+
+      // 使用.gitignore规则或默认黑名单进行过滤
+      const shouldIgnore =
+        typeof isIgnore === "boolean"
+          ? isIgnore
+          : folderBlackList.includes(entry.name);
+
+      if (entry.isDirectory() && !shouldIgnore) {
         result.push(`${prefix}- ${entry.name}`);
         const subEntries = await buildTree(
           path.join(dir, entry.name),
-          prefix + indent
+          prefix + indent,
+          entryRelativePath
         );
         result.push(...subEntries);
-      } else {
+      } else if (!shouldIgnore) {
         result.push(`${prefix}- ${entry.name}`);
       }
     }
@@ -232,7 +285,7 @@ async function getFileTree(rootPath: string): Promise<string> {
     return result;
   };
 
-  const result = await buildTree(rootPath, "");
+  const result = await buildTree(rootPath, "", "");
   return ["root", ...result].join("\n");
 }
 
