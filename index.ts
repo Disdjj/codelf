@@ -9,7 +9,30 @@ import { exec } from "child_process";
 import { promisify } from "util";
 
 const execPromise = promisify(exec);
-const folderBlackList = ["node_modules", ".codelf", ".git"];
+const folderBlackList = [
+  "node_modules", 
+  ".codelf", 
+  ".git", 
+  ".idea", 
+  ".vscode", 
+  "dist", 
+  "build", 
+  "out", 
+  "target", 
+  "bin", 
+  "obj", 
+  ".next", 
+  "coverage", 
+  "__pycache__", 
+  ".DS_Store", 
+  "tmp", 
+  "temp", 
+  "logs", 
+  ".cache", 
+  ".github", 
+  ".gitlab", 
+  "vendor"
+];
 
 // Create server instance
 const server = new McpServer({

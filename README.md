@@ -2,6 +2,8 @@
 
 > By DJJ & Dannielee
 
+[![CN](https://img.shields.io/badge/语言-中文版-red.svg)](./README_CN.md)
+
 Codelf is a powerful AI-assisted coding tool that provides better code understanding and modification capabilities for AI agents through the Model Context Protocol (MCP).
 
 ## MCP Setup
@@ -46,6 +48,18 @@ Everytime you finish editing code, call `update-project-info` and follow the ins
 4. if you are in windows, add 
     ```I am currently under the Windows system. Use like "C:\Users\..." to send Path```
 
+## Windsurf Setup
+
+1. goto `Settings` -> `cascade` -> `Memories and Rules` -> `Global rules`
+2. add Content
+```
+Before responding or modifying the code, one should first obtain comprehensive information via `get-project-info` before making any decisions.
+Everytime you finish editing code, call `update-project-info` and follow the instructions from the response
+```
+3. if you are in windows, add 
+```
+I am currently under the Windows system. Use like "C:\\Users\\..." to send Path
+```
 
 ## Core Features
 
