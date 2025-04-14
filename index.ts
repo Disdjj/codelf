@@ -38,6 +38,16 @@ const folderBlackList = [
 
 const forceBlackList = [".git", ".codelf", ".vscode", ".idea"];
 
+const GET_PROJECT_TEMPLATE = `
+This is the current project details, include project structure, dev attentions, and other important information:
+
+{{S}}
+
+Keep in mind:
+1. after you finish modifying code to stisfy user requirements, you have to call 'update-project-info' which help you ensure the document remains up to date.
+2. follow the response of 'update-project-info' to update .codelf/*.md files.
+`;
+
 // 用于解析.gitignore文件的函数
 async function parseGitignore(
   rootPath: string,
@@ -88,22 +98,16 @@ its very useful for cursor or windsurf no martter in agent or edit mode.
     ),
   },
   async ({ rootPath }) => {
-    // get rootPath/.coedelf/*.md and build to like:
-    /*
-  <Name1(markdown file 1)>
-  {markdown file content}
-  </Name2(markdown file 1)>
-
-  <Name2(markdown file)>
-  {markdown file content}
-  </Name2(markdown file 1)>
-     */
     const content = await fs
       .readdir(path.join(rootPath, ".codelf"))
       .then(async (files) => {
         const mdFiles = files.filter((f) => f.endsWith(".md"));
         const contents = await Promise.all(
           mdFiles.map(async (file) => {
+            // ignore files start with "_", like _changelog.md
+            if (file.startsWith("_")) {
+              return "";
+            }
             const content = await fs.readFile(
               path.join(rootPath, ".codelf", file),
               "utf-8"
@@ -112,7 +116,7 @@ its very useful for cursor or windsurf no martter in agent or edit mode.
             return `<${name}>\n\n${content}\n\n</${name}>\n`;
           })
         );
-        return contents.join("\n");
+        return GET_PROJECT_TEMPLATE.replace("{{S}}", contents.join("\n"));
       })
       .catch(() => "");
     return {
@@ -128,7 +132,7 @@ its very useful for cursor or windsurf no martter in agent or edit mode.
 
 server.tool(
   "update-project-info",
-  "when update project info, you have to update .codelf/*.md files.",
+  "when you have finished modifying code to stisfy user requirements, you have to update .codelf/*.md files. This tool help you ensure the document remains up to date.",
   {
     rootPath: z.string().describe(
       `The root path of the project,
