@@ -145,7 +145,9 @@ server.tool(
       content: [
         {
           type: "text",
-          text: "[ATTENTION] Read files .codelf/project.md and .codelf/changelog.md and update them base on the changes you have done.",
+          text: `[ATTENTION] Next step you must do: 
+** Read files .codelf/project.md and .codelf/changelog.md and update them base on the changes you have just done.**
+        `,
         },
       ],
     };
