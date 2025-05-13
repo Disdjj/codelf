@@ -244,26 +244,61 @@ server.tool(
 );
 
 async function getFileTree(rootPath: string): Promise<string> {
-  const files = await fs.readdir(rootPath, { withFileTypes: true });
-  const tree: string[] = [];
   const indent = "    ";
 
-  // 尝试解析.gitignore文件
-  // 如果.gitignore存在且解析成功，使用其规则；否则使用默认黑名单
+  // 递归处理单个路径（目录或文件）
+  const processEntry = async (entryPath: string, displayName: string, prefix: string, relativePath: string): Promise<string[]> => {
+    const stat = await fs.stat(entryPath).catch(() => null);
+    const lines: string[] = [];
+    if (stat && stat.isDirectory()) {
+      lines.push(`${prefix}- ${displayName}`);
+      const entries = await fs.readdir(entryPath, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isDirectory() && forceBlackList.includes(entry.name)) continue;
+        const entryRelativePath = path.join(relativePath, entry.name).replace(/\\/g, "/");
+        const subPath = path.join(entryPath, entry.name);
+        lines.push(...(await processEntry(subPath, entry.name, prefix + indent, entryRelativePath)));
+      }
+    } else if (stat && stat.isFile()) {
+      lines.push(`${prefix}- ${displayName}`);
+    }
+    return lines;
+  };
 
   const buildTree = async (
     dir: string,
     prefix: string,
     relativePath: string = ""
   ): Promise<string[]> => {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
+    const codelfPath = path.join(rootPath, ".codelf.config");
     const result: string[] = [];
+    const existsCodelfFile = existsSync(codelfPath) && !(await fs.stat(codelfPath)).isDirectory();
 
+    if (existsCodelfFile && dir === rootPath) {
+      // 读取 .codelf.config 文件内容
+      const content = await fs.readFile(codelfPath, "utf-8");
+      const lines = content
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l && !l.startsWith("#"));
+      if (lines.length) {
+        for (const line of lines) {
+          const entryPath = path.join(rootPath, line);
+          result.push(...(await processEntry(entryPath, line, prefix, line.replace(/\\/g, "/"))));
+        }
+        return result;
+      }
+    }
+
+    // 原有递归逻辑
+    const entries = await fs.readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
       if (entry.isDirectory() && forceBlackList.includes(entry.name)) {
         continue;
       }
-
+      
+      // 尝试解析.gitignore文件
+      // 如果.gitignore存在且解析成功，使用其规则；否则使用默认黑名单
       const entryRelativePath = path
         .join(relativePath, entry.name)
         .replace(/\\/g, "/");
@@ -274,17 +309,9 @@ async function getFileTree(rootPath: string): Promise<string> {
         typeof isIgnore === "boolean"
           ? isIgnore
           : folderBlackList.includes(entry.name);
-
-      if (entry.isDirectory() && !shouldIgnore) {
-        result.push(`${prefix}- ${entry.name}`);
-        const subEntries = await buildTree(
-          path.join(dir, entry.name),
-          prefix + indent,
-          entryRelativePath
-        );
-        result.push(...subEntries);
-      } else if (!shouldIgnore) {
-        result.push(`${prefix}- ${entry.name}`);
+      if (!shouldIgnore) {
+        const entryPath = path.join(dir, entry.name);
+        result.push(...(await processEntry(entryPath, entry.name, prefix, entryRelativePath)));
       }
     }
 
