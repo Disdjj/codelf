@@ -43,6 +43,8 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\""
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "dev": "tsx watch index.ts",
+    "dev:nodemon": "nodemon --exec tsx index.ts"
   }
 }
