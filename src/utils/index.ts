@@ -1,6 +1,7 @@
 import { existsSync, promises as fs } from "fs";
 import * as path from "path";
 import * as gitignoreParser from "gitignore-parser";
+import dayjs from "dayjs";
 
 // 默认黑名单，当.gitignore不存在时使用
 const folderBlackList = [
@@ -84,7 +85,7 @@ export async function getFileTree(rootPath: string): Promise<string> {
         prefix: string,
         relativePath: string = ""
     ): Promise<string[]> => {
-        const codelfPath = path.join(rootPath, ".codelf.config");
+        const codelfPath = path.join(dir, ".codelf.config");
         const result: string[] = [];
         const existsCodelfFile = existsSync(codelfPath) && !(await fs.stat(codelfPath)).isDirectory();
 
@@ -134,4 +135,132 @@ export async function getFileTree(rootPath: string): Promise<string> {
 
     const result = await buildTree(rootPath, "", "");
     return ["root", ...result].join("\n");
+}
+
+export async function generateProjectYaml(rootPath: string, analyzeDirectory?: string) {
+    if (!rootPath) return
+    console.log("rootPath", rootPath)
+    try {
+        // 设置默认的输出路径
+        const outputPath = path.join(rootPath, ".codelf", "projectInfo.yaml");
+        analyzeDirectory = analyzeDirectory || rootPath;
+        
+        // 递归解析目录结构
+        const analyzeStructure = async (dirPath: string): Promise<any[]> => {
+            const items: any[] = [];
+            
+            try {
+                const entries = await fs.readdir(dirPath, { withFileTypes: true });
+                
+                for (const entry of entries) {
+                    // 跳过黑名单中的文件和文件夹
+                    if (forceBlackList.includes(entry.name)) {
+                        continue;
+                    }
+                    
+                    const entryPath = path.join(dirPath, entry.name);
+                    const relativePath = path.relative(dirPath, entryPath).replace(/\\/g, "/");
+                    
+                    // 检查是否应该忽略此项
+                    const isIgnore = await parseGitignore(dirPath, relativePath);
+                    const shouldIgnore = typeof isIgnore === "boolean" 
+                        ? isIgnore 
+                        : folderBlackList.includes(entry.name);
+                    
+                    if (!shouldIgnore) {
+                        if (entry.isDirectory()) {
+                            // 处理目录
+                            const subItems = await analyzeStructure(entryPath);
+                            const dirItem = {
+                                entry: entry.name,
+                                ...(subItems.length > 0 && { subs: subItems })
+                            };
+                            items.push(dirItem);
+                        } else if (entry.isFile()) {
+                            // 处理文件
+                            const fileItem = {
+                                entry: entry.name,
+                            };
+                            items.push(fileItem);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(`Error reading directory ${dirPath}:`, error);
+            }
+            
+            return items;
+        };
+
+        // 生成结构
+        const structure = await analyzeStructure(analyzeDirectory);
+        
+        // 生成YAML内容
+        const generateYamlContent = (obj: any, indent: number = 0): string => {
+            const spaces = "  ".repeat(indent);
+            let result = "";
+            
+            if (Array.isArray(obj)) {
+                for (const item of obj) {
+                    result += `${spaces}- ${generateYamlContent(item, 0).trim()}\n`;
+                }
+                return result;
+            }
+            
+            if (typeof obj === "object" && obj !== null) {
+                const entries = Object.entries(obj);
+                for (let i = 0; i < entries.length; i++) {
+                    const [key, value] = entries[i];
+                    if (key === "entry" && i === 0) {
+                        result += `entry: "${value}"\n`;
+                    } else if (typeof value === "string") {
+                        result += `${spaces}${key}: "${value}"\n`;
+                    } else if (Array.isArray(value)) {
+                        if (key === "subs") {
+                            result += `${spaces}${key}:\n`;
+                            for (const sub of value) {
+                                result += `${spaces}  - ${generateYamlContent(sub, indent + 2).trim()}\n`;
+                            }
+                        } else {
+                            result += `${spaces}${key}:\n${generateYamlContent(value, indent + 1)}`;
+                        }
+                    } else {
+                        result += `${spaces}${key}:\n${generateYamlContent(value, indent + 1)}`;
+                    }
+                }
+                return result;
+            }
+            
+            return String(obj);
+        };
+        
+        // 获取最后一级目录名
+        const dirName = path.basename(analyzeDirectory);
+        
+        // 构造完整的YAML内容，将最后一级目录作为根entry
+        console.log("outputPath", outputPath)
+        const yamlContent = `- entry: "${dirName}"\n  subs:\n${generateYamlContent(structure, 2)}`;
+        
+        // 写入文件
+        await fs.appendFile(outputPath, yamlContent, "utf-8");
+        
+        console.log(`项目YAML文件已生成: ${outputPath}`);
+        return yamlContent;
+        
+    } catch (error) {
+        console.error("生成项目YAML文件时出错:", error);
+        throw error;
+    }
+}
+
+export async function generateChangelogYaml(outputPath: string) {
+    if (!outputPath) return
+    const yamlContent = `
+${dayjs().format("YYYY-MM-DD HH:mm:ss")}:
+  title: "changelog_title"
+  content: "changelog_content"
+`;
+    
+    // 写入文件
+    fs.writeFile(outputPath, yamlContent, "utf-8");
 }
