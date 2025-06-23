@@ -5,13 +5,13 @@ import { promises as fs } from "fs";
 import * as path from "path";
 
 const GET_PROJECT_TEMPLATE = `
-This is the current project details, include project structure, dev attentions, and other important information:
+This is the current project details, include project structure:
 
 {{S}}
 
 Keep in mind:
 1. after you finish modifying code to stisfy user requirements, you have to call 'update-project-info' which help you ensure the document remains up to date.
-2. follow the response of 'update-project-info' to update .codelf/*.md files.
+2. follow the response of 'update-project-info' to update .codelf/*.yaml files.
 `;
 
 export const getProjectInfo = (server: any) => {
@@ -33,10 +33,10 @@ export const getProjectInfo = (server: any) => {
             const content = await fs
                 .readdir(path.join(rootPath, ".codelf"))
                 .then(async (files) => {
-                    const mdFiles = files.filter((f) => f.endsWith(".md"));
+                    const yamlFiles = files.filter((f) => f.endsWith(".yaml"));
                     const contents = await Promise.all(
-                        mdFiles.map(async (file) => {
-                            // ignore files start with "_", like _changelog.md
+                        yamlFiles.map(async (file) => {
+                            // ignore files start with "_", like _changelog.yaml
                             if (file.startsWith("_")) {
                                 return "";
                             }
@@ -44,7 +44,7 @@ export const getProjectInfo = (server: any) => {
                                 path.join(rootPath, ".codelf", file),
                                 "utf-8"
                             );
-                            const name = path.basename(file, ".md");
+                            const name = path.basename(file, ".yaml");
                             return `<${name}>\n\n${content}\n\n</${name}>\n`;
                         })
                     );
