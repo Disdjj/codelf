@@ -20,12 +20,18 @@ importers:
       '@types/gitignore-parser':
         specifier: ^0.0.3
         version: 0.0.3
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
       gitignore-parser:
         specifier: ^0.0.2
         version: 0.0.2
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
       minimist:
         specifier: ^1.2.8
         version: 1.2.8
@@ -207,6 +213,9 @@ packages:
   '@types/gitignore-parser@0.0.3':
     resolution: {integrity: sha512-sbdu1sG2pQcwjEYWTsX78OqJo5pKnonwC4FV3m2JeQRE2xYb3q0icHHopCHEvpn4uIBuvWBTpJUCJ76ISK24CA==}
 
+  '@types/js-yaml@4.0.9':
+    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
+
   '@types/minimist@1.2.5':
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
 
@@ -247,6 +256,9 @@ packages:
   ansi-styles@6.2.1:
     resolution: {integrity: sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==}
     engines: {node: '>=12'}
+
+  argparse@2.0.1:
+    resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -527,6 +539,10 @@ packages:
   js-cookie@3.0.5:
     resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==}
     engines: {node: '>=14'}
+
+  js-yaml@4.1.0:
+    resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
+    hasBin: true
 
   leac@0.6.0:
     resolution: {integrity: sha512-y+SqErxb8h7nE/fiEX07jsbuhrpO9lL8eca7/Y1nuWV2moNlXhyd59iDGcRf6moVyDMbmTNzL40SUyrFU/yDpg==}
@@ -987,6 +1003,8 @@ snapshots:
 
   '@types/gitignore-parser@0.0.3': {}
 
+  '@types/js-yaml@4.0.9': {}
+
   '@types/minimist@1.2.5': {}
 
   '@types/node@22.13.10':
@@ -1020,6 +1038,8 @@ snapshots:
       color-convert: 2.0.1
 
   ansi-styles@6.2.1: {}
+
+  argparse@2.0.1: {}
 
   balanced-match@1.0.2: {}
 
@@ -1328,6 +1348,10 @@ snapshots:
       nopt: 7.2.1
 
   js-cookie@3.0.5: {}
+
+  js-yaml@4.1.0:
+    dependencies:
+      argparse: 2.0.1
 
   leac@0.6.0: {}
 
