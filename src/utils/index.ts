@@ -2,6 +2,7 @@ import { existsSync, promises as fs } from "fs";
 import * as path from "path";
 import * as gitignoreParser from "gitignore-parser";
 import dayjs from "dayjs";
+import * as yaml from "js-yaml";
 
 // 默认黑名单，当.gitignore不存在时使用
 const folderBlackList = [
@@ -139,13 +140,12 @@ export async function getFileTree(rootPath: string): Promise<string> {
 
 export async function generateProjectYaml(rootPath: string, analyzeDirectory?: string) {
     if (!rootPath) return
-    console.log("rootPath", rootPath)
     try {
         // 设置默认的输出路径
         const outputPath = path.join(rootPath, ".codelf", "projectInfo.yaml");
         analyzeDirectory = analyzeDirectory || rootPath;
         
-        // 递归解析目录结构
+        // 分析项目结构
         const analyzeStructure = async (dirPath: string): Promise<any[]> => {
             const items: any[] = [];
             
@@ -171,10 +171,12 @@ export async function generateProjectYaml(rootPath: string, analyzeDirectory?: s
                         if (entry.isDirectory()) {
                             // 处理目录
                             const subItems = await analyzeStructure(entryPath);
-                            const dirItem = {
+                            const dirItem: any = {
                                 entry: entry.name,
-                                ...(subItems.length > 0 && { subs: subItems })
                             };
+                            if (subItems.length > 0) {
+                                dirItem.subs = subItems;
+                            }
                             items.push(dirItem);
                         } else if (entry.isFile()) {
                             // 处理文件
@@ -195,51 +197,16 @@ export async function generateProjectYaml(rootPath: string, analyzeDirectory?: s
         // 生成结构
         const structure = await analyzeStructure(analyzeDirectory);
         
-        // 生成YAML内容
-        const generateYamlContent = (obj: any, indent: number = 0): string => {
-            const spaces = "  ".repeat(indent);
-            let result = "";
-            
-            if (Array.isArray(obj)) {
-                for (const item of obj) {
-                    result += `${spaces}- ${generateYamlContent(item, 0).trim()}\n`;
-                }
-                return result;
-            }
-            
-            if (typeof obj === "object" && obj !== null) {
-                const entries = Object.entries(obj);
-                for (let i = 0; i < entries.length; i++) {
-                    const [key, value] = entries[i];
-                    if (key === "entry" && i === 0) {
-                        result += `entry: "${value}"\n`;
-                    } else if (typeof value === "string") {
-                        result += `${spaces}${key}: "${value}"\n`;
-                    } else if (Array.isArray(value)) {
-                        if (key === "subs") {
-                            result += `${spaces}${key}:\n`;
-                            for (const sub of value) {
-                                result += `${spaces}  - ${generateYamlContent(sub, indent + 2).trim()}\n`;
-                            }
-                        } else {
-                            result += `${spaces}${key}:\n${generateYamlContent(value, indent + 1)}`;
-                        }
-                    } else {
-                        result += `${spaces}${key}:\n${generateYamlContent(value, indent + 1)}`;
-                    }
-                }
-                return result;
-            }
-            
-            return String(obj);
-        };
-        
         // 获取最后一级目录名
         const dirName = path.basename(analyzeDirectory);
         
-        // 构造完整的YAML内容，将最后一级目录作为根entry
-        console.log("outputPath", outputPath)
-        const yamlContent = `- entry: "${dirName}"\n  subs:\n${generateYamlContent(structure, 2)}`;
+        const yamlData = [{
+            entry: dirName,
+            subs: structure,
+        }];
+
+        // 使用 js-yaml 库生成 YAML 内容
+        const yamlContent = yaml.dump(yamlData, { indent: 2 });
         
         // 写入文件
         await fs.appendFile(outputPath, yamlContent, "utf-8");
