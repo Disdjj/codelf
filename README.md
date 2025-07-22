@@ -2,6 +2,10 @@
 
 > By DJJ & Dannielee
 
+## Thanks
+
+** Powered By [AiHubMix](https://aihubmix.com) **
+
 [![CN](https://img.shields.io/badge/语言-中文版-red.svg)](./README_CN.md)
 
 Codelf is a powerful AI-assisted coding tool that provides better code understanding and modification capabilities for AI agents through the Model Context Protocol (MCP).
