@@ -4,7 +4,7 @@
 
 ## Thanks
 
-** Powered By [AiHubMix](https://aihubmix.com) **
+**Powered By [AiHubMix](https://aihubmix.com)**
 
 [![CN](https://img.shields.io/badge/语言-中文版-red.svg)](./README_CN.md)
 
