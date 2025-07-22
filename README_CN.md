@@ -2,6 +2,9 @@
 
 > 由 DJJ 和 Dannielee 开发
 
+## Thanks
+**Powered By [AiHubMix](https://aihubmix.com)**
+
 [![EN](https://img.shields.io/badge/Language-English-blue.svg)](./README.md)
 
 Codelf 是一个强大的AI辅助编码工具，通过模型上下文协议（Model Context Protocol，MCP）为AI代理提供更好的代码理解和修改能力。
