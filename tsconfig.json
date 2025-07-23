@@ -9,7 +9,10 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true
   },
   "include": ["./**/*"],
   "exclude": ["node_modules"]
